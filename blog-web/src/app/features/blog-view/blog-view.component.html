@@ -1,0 +1,80 @@
+<div class="view-container animate-fade-in" *ngIf="entry$ | async as entry; else loading">
+  <a routerLink="/" class="back-link">← Back to Explore</a>
+
+  <article class="glass-panel main-article">
+    <header class="article-header">
+      <div class="badges">
+        <span class="category">{{ entry.category }}</span>
+        <span class="tag" *ngIf="entry.hashtag">#{{ entry.hashtag }}</span>
+      </div>
+      
+      <h1 class="gradient-text">{{ entry.title }}</h1>
+      
+      <div class="article-meta">
+        <div class="author-block">
+          <div class="avatar">{{ entry.author.charAt(0).toUpperCase() }}</div>
+          <div class="author-details">
+            <span class="name">{{ entry.author }}</span>
+            <span class="date">{{ entry.creationDate | date:'longDate' }} at {{ entry.creationDate | date:'shortTime' }}</span>
+          </div>
+        </div>
+        <div class="stats-block">
+          <span>👁 {{ entry.impressionCount }} views</span>
+        </div>
+      </div>
+      
+      <div class="edit-dates" *ngIf="entry.editDates.length > 0">
+        <small>Edited: <span *ngFor="let ed of entry.editDates; let last=last">{{ ed | date:'short' }}{{ !last ? ', ' : '' }}</span></small>
+      </div>
+    </header>
+
+    <div class="article-description">
+      {{ entry.description }}
+    </div>
+
+    <div class="article-content" [innerHTML]="getSafeHtml(entry.content)"></div>
+  </article>
+
+  <!-- Comments Section -->
+  <section class="comments-section" *ngIf="entry.commentsAllowed">
+    <h2>Comments ({{ entry.comments.length }})</h2>
+    
+    <div class="add-comment glass-panel">
+      <h3>Add a Comment</h3>
+      <div class="form-group">
+        <input type="text" [(ngModel)]="newCommentAuthor" placeholder="Your Name" />
+      </div>
+      <div class="form-group">
+        <textarea [(ngModel)]="newCommentText" placeholder="Share your thoughts..." rows="3"></textarea>
+      </div>
+      <button class="btn-primary" (click)="submitComment(entry.id)">Post Comment</button>
+    </div>
+
+    <div class="comments-list">
+      <div class="comment glass-panel" *ngFor="let comment of entry.comments">
+        <div class="comment-avatar">{{ comment.author.charAt(0).toUpperCase() }}</div>
+        <div class="comment-body">
+          <div class="comment-meta">
+            <span class="comment-author">{{ comment.author }}</span>
+            <span class="comment-date">{{ comment.date | date:'medium' }}</span>
+          </div>
+          <p class="comment-text">{{ comment.text }}</p>
+        </div>
+      </div>
+      
+      <div class="no-comments" *ngIf="entry.comments.length === 0">
+        No comments yet. Be the first to start the conversation!
+      </div>
+    </div>
+  </section>
+  
+  <section class="comments-disabled glass-panel" *ngIf="!entry.commentsAllowed">
+    <p>Comments are disabled for this entry.</p>
+  </section>
+</div>
+
+<ng-template #loading>
+  <div class="loading-state pulse">
+    Loading entry...
+  </div>
+</ng-template>

@@ -1,0 +1,34 @@
+<div class="blog-header animate-fade-in">
+  <h1>Explore entries</h1>
+  <p class="subtitle">Read the latest thoughts and discoveries.</p>
+</div>
+
+<div class="blog-grid" *ngIf="entries$ | async as entries">
+  <div *ngFor="let entry of entries" class="blog-card glass-panel animate-fade-in" style="animation-delay: 0.1s;">
+    <div class="card-header">
+      <span class="category">{{ entry.category }}</span>
+      <span class="date">{{ entry.creationDate | date:'mediumDate' }}</span>
+    </div>
+    <div class="card-body">
+      <h2>{{ entry.title }}</h2>
+      <p class="description">{{ entry.description }}</p>
+      <div class="meta-info">
+        <div class="author-info">
+          <div class="avatar">{{ entry.author.charAt(0).toUpperCase() }}</div>
+          <span>{{ entry.author }}</span>
+        </div>
+        <div class="stats">
+          <span>👁 {{ entry.impressionCount }}</span>
+          <span>💬 {{ entry.comments.length }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <a [routerLink]="['/entry', entry.id]" class="btn-read-more">
+        Read More
+        <span class="arrow">→</span>
+      </a>
+      <span class="tag" *ngIf="entry.hashtag">#{{ entry.hashtag }}</span>
+    </div>
+  </div>
+</div>

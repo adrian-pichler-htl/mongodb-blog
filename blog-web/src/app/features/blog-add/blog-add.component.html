@@ -1,0 +1,77 @@
+<div class="add-container animate-fade-in">
+  <div class="header-section text-center">
+    <h1 class="gradient-text">Create a New Entry</h1>
+    <p class="subtitle">Share your knowledge with the world.</p>
+  </div>
+
+  <form class="glass-panel add-form" (ngSubmit)="onSubmit()">
+    
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Title *</label>
+        <input type="text" [(ngModel)]="title" name="title" required placeholder="A catchy title..." />
+      </div>
+
+      <div class="form-group">
+        <label>Author *</label>
+        <input type="text" [(ngModel)]="author" name="author" required placeholder="Your name or handle" />
+      </div>
+
+      <div class="form-group">
+        <label>Category *</label>
+        <select [(ngModel)]="category" name="category" required>
+          <option value="" disabled selected>Select a category</option>
+          <option value="Technology">Technology</option>
+          <option value="Frontend">Frontend</option>
+          <option value="Database">Database</option>
+          <option value="Design">Design</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Hashtag</label>
+        <input type="text" [(ngModel)]="hashtag" name="hashtag" placeholder="e.g. angular" />
+      </div>
+    </div>
+
+    <div class="form-group full-width">
+      <label>Description *</label>
+      <input type="text" [(ngModel)]="description" name="description" required placeholder="A short summary of the content" />
+    </div>
+
+    <div class="form-group full-width">
+      <label>Main Content</label>
+      <textarea [(ngModel)]="textContent" name="textContent" rows="8" placeholder="Write your full entry here..."></textarea>
+    </div>
+
+    <div class="form-group full-width">
+      <label>Upload Images (Base64 encoding) - Optional</label>
+      <div class="file-upload">
+        <input type="file" (change)="onFileChange($event)" accept="image/*" multiple id="fileInput"/>
+        <label for="fileInput" class="btn-secondary upload-label">
+          <span>📁 Browse Images</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="image-previews" *ngIf="images.length > 0">
+      <div class="preview-item" *ngFor="let img of images; let i = index">
+        <img [src]="img.dataUrl" [alt]="img.name" />
+        <button type="button" class="btn-remove" (click)="removeImage(i)">✕</button>
+      </div>
+    </div>
+
+    <div class="form-group full-width toggle-group">
+      <label class="switch">
+        <input type="checkbox" [(ngModel)]="commentsAllowed" name="commentsAllowed">
+        <span class="slider round"></span>
+      </label>
+      <span class="toggle-label">Allow Comments on this post</span>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" routerLink="/">Cancel</button>
+      <button type="submit" class="btn-primary">Publish Entry</button>
+    </div>
+  </form>
+</div>
