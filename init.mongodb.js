@@ -128,7 +128,8 @@ db.entries.insertMany([
     content: {
       text: "Here is a cool link: https://google.com and an image.",
       links: ["https://google.com"],
-      images: [base64Img1]
+      images: [base64Img1],
+      additionalField: "Some extra data"
     },
     commentsAllowed: true,
     category: "Programming",
@@ -144,7 +145,8 @@ db.entries.insertMany([
     content: {
       text: "Make sure you use indexes. Database Performance Tuning is key. Here are two images.",
       links: [],
-      images: [base64Img1, base64Img2]
+      images: [base64Img1, base64Img2],
+      additionalField: "Expert level"
     },
     commentsAllowed: true,
     category: "Database",
@@ -160,7 +162,8 @@ db.entries.insertMany([
     content: {
       text: "Just enjoying the warm weather and reading.",
       links: [],
-      images: []
+      images: [],
+      additionalField: null
     },
     commentsAllowed: true,
     category: "Lifestyle",
@@ -177,6 +180,7 @@ db.entries.insertMany([
       text: "AI is growing exponentially. Check https://openai.com",
       links: ["https://openai.com"],
       images: [base64Img2]
+      // Hier fehlt additionalField absichtlich für Query 3 ($exists: false)
     },
     commentsAllowed: false,
     category: "Programming",
@@ -192,7 +196,8 @@ db.entries.insertMany([
     content: {
       text: "Learning Docker is fun and practical.",
       links: [],
-      images: []
+      images: [],
+      additionalField: "Container magic"
     },
     commentsAllowed: true,
     category: "DevOps",

@@ -107,7 +107,8 @@ db.entries.updateOne(
         },
         $setOnInsert: {
             creationDate: new Date(),
-            impressionCount: 0,
+            editDates: [],
+            impressionCount: NumberLong(0),
             commentsAllowed: true,
             category: "Neuigkeiten",
             comments: []
