@@ -4,6 +4,95 @@ use('blogDB');
 db.users.drop();
 db.entries.drop();
 
+// Schema for entries
+db.createCollection('entries', {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["title", "author", "description", "creationDate", "editDates", "impressionCount", "content", "commentsAllowed", "category"],
+      properties: {
+        title: {
+          bsonType: "string",
+          description: "must be a string and is required"
+        },
+        author: {
+          bsonType: "object",
+          required: ["username"],
+          properties: {
+            username: { bsonType: "string" },
+            name: { bsonType: "string" }
+          },
+          description: "must be an object containing at least the username"
+        },
+        description: {
+          bsonType: "string"
+        },
+        creationDate: {
+          bsonType: "date"
+        },
+        editDates: {
+          bsonType: "array",
+          items: { bsonType: "date" }
+        },
+        impressionCount: {
+          bsonType: "long",
+          description: "must be a long integer"
+        },
+        content: {
+          bsonType: "object",
+          required: ["text"],
+          properties: {
+            text: { bsonType: "string" },
+            links: { bsonType: "array", items: { bsonType: "string" } },
+            images: { bsonType: "array", items: { bsonType: "string" }, description: "Base64 encoded images" }
+          }
+        },
+        commentsAllowed: {
+          bsonType: "bool"
+        },
+        category: {
+          bsonType: "string"
+        },
+        comments: {
+          bsonType: "array",
+          items: {
+            bsonType: "object",
+            required: ["text", "author", "date"],
+            properties: {
+              text: { bsonType: "string" },
+              author: { bsonType: "string" },
+              date: { bsonType: "date" }
+            }
+          }
+        }
+      }
+    }
+  }
+});
+
+// Schema for users
+db.createCollection('users', {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["username", "name", "email", "password"],
+      properties: {
+        username: { bsonType: "string" },
+        name: {
+          bsonType: "object",
+          required: ["firstname", "lastname"],
+          properties: {
+            firstname: { bsonType: "string" },
+            lastname: { bsonType: "string" }
+          }
+        },
+        email: { bsonType: "string", pattern: "^.+@.+$" },
+        password: { bsonType: "string" }
+      }
+    }
+  }
+});
+
 // Indexes
 db.users.createIndex({ username: 1 }, { unique: true });
 db.entries.createIndex({ title: 1, 'author.username': 1 }, { unique: true });
@@ -35,12 +124,11 @@ db.entries.insertMany([
     description: "A post about programming.",
     creationDate: tenDaysAgo,
     editDates: [],
-    impressionCount: 1500,
+    impressionCount: NumberLong(1500),
     content: {
       text: "Here is a cool link: https://google.com and an image.",
       links: ["https://google.com"],
-      images: [base64Img1],
-      additionalField: "Some extra data"
+      images: [base64Img1]
     },
     commentsAllowed: true,
     category: "Programming",
@@ -52,12 +140,11 @@ db.entries.insertMany([
     description: "Improving MongoDB queries.",
     creationDate: new Date(),
     editDates: [new Date()],
-    impressionCount: 300,
+    impressionCount: NumberLong(300),
     content: {
       text: "Make sure you use indexes. Database Performance Tuning is key. Here are two images.",
       links: [],
-      images: [base64Img1, base64Img2],
-      additionalField: "Expert level"
+      images: [base64Img1, base64Img2]
     },
     commentsAllowed: true,
     category: "Database",
@@ -69,12 +156,11 @@ db.entries.insertMany([
     description: "What I have been up to.",
     creationDate: twoDaysAgo,
     editDates: [],
-    impressionCount: 50,
+    impressionCount: NumberLong(50),
     content: {
       text: "Just enjoying the warm weather and reading.",
       links: [],
-      images: [],
-      additionalField: null
+      images: []
     },
     commentsAllowed: true,
     category: "Lifestyle",
@@ -86,7 +172,7 @@ db.entries.insertMany([
     description: "Insights into AI agents.",
     creationDate: fiveDaysAgo,
     editDates: [],
-    impressionCount: 88,
+    impressionCount: NumberLong(88),
     content: {
       text: "AI is growing exponentially. Check https://openai.com",
       links: ["https://openai.com"],
@@ -102,12 +188,11 @@ db.entries.insertMany([
     description: "It is so easy to start MongoDB.",
     creationDate: new Date(),
     editDates: [],
-    impressionCount: 15,
+    impressionCount: NumberLong(15),
     content: {
       text: "Learning Docker is fun and practical.",
       links: [],
-      images: [],
-      additionalField: "Container magic"
+      images: []
     },
     commentsAllowed: true,
     category: "DevOps",
@@ -144,4 +229,4 @@ db.entries.updateOne(
   { $push: { comments: { text: "Nice update, keep it up!", author: "tech_guru", date: new Date() } } }
 );
 
-print("Database initialization completed successfully!");
+print("Database initialization with explicit schema completed successfully!");
