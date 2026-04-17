@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { connectToDatabase } = require('./db');
-const { ObjectId } = require('mongodb');
+const { ObjectId, Long } = require('mongodb');
 
 const app = express();
 const port = 3000;
@@ -48,19 +48,46 @@ app.get('/api/entries/:id', async (req, res) => {
 app.post('/api/entries', async (req, res) => {
   try {
     const entry = req.body;
+
+    // 1. Ensure basics are present
+    if (!entry.title) entry.title = "Untitled Post";
+    if (!entry.description) entry.description = "No description provided.";
+    
+    // 2. Normalize Author structure (Schema requires an object with username)
+    if (typeof entry.author === 'string') {
+      entry.author = { username: entry.author, name: entry.author };
+    } else if (!entry.author || !entry.author.username) {
+      entry.author = { username: "admin", name: "Admin User" };
+    }
+
+    // 3. Set server-side managed fields (Schema requirements)
     entry.creationDate = new Date();
     entry.editDates = [];
-    entry.impressionCount = 0;
+    entry.impressionCount = Long.fromInt(0); // Must be BSON Long for validator
+
+    if (entry.commentsAllowed === undefined) entry.commentsAllowed = true;
+    if (!entry.category) entry.category = "General";
     if (!entry.comments) entry.comments = [];
 
-    if (typeof entry.content === 'string') {
-      entry.content = { text: entry.content, links: [], images: [] };
+    // 4. Tighten content structure
+    if (typeof entry.content === 'string' || !entry.content) {
+      entry.content = {
+        text: entry.content || "",
+        links: [],
+        images: []
+      };
+    } else {
+      if (!entry.content.text) entry.content.text = "";
+      if (!entry.content.links) entry.content.links = [];
+      if (!entry.content.images) entry.content.images = [];
     }
 
     const doc = await db.collection('entries').insertOne(entry);
     res.status(201).json({ id: doc.insertedId });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("!!! DATABASE VALIDATION ERROR !!!");
+    console.error(err.message);
+    res.status(500).json({ error: "Document failed validation", detailedError: err.message });
   }
 });
 
